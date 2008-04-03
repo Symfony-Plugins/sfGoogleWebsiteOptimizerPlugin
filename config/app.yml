@@ -1,0 +1,10 @@
+# all:
+#   sf_google_website_optimizer_plugin:
+#     enabled: off
+#     ab_experiment_class: sfGoogleWebsiteOptimizerABExperiment
+#     multi_experiment_class: sfGoogleWebsiteOptimizerMultiExperiment
+#     experiments:
+#       landing_page1:
+#         enabled:  on
+#         type:     ab
+#         key:      0000000000
