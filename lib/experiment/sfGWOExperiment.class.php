@@ -8,7 +8,7 @@
  * @author      Kris Wallsmith <kris [dot] wallsmith [at] gmail [dot] com>
  * @version     SVN: $Id$
  */
-abstract class sfGoogleWebsiteOptimizerExperiment
+abstract class sfGWOExperiment
 {
   const
     POSITION_TOP    = 'top',

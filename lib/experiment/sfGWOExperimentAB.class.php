@@ -8,10 +8,10 @@
  * @author      Kris Wallsmith <kris [dot] wallsmith [at] gmail [dot] com>
  * @version     SVN: $Id$
  */
-class sfGoogleWebsiteOptimizerABExperiment extends sfGoogleWebsiteOptimizerExperiment
+class sfGWOExperimentAB extends sfGWOExperiment
 {
   /**
-   * @see sfGoogleWebsiteOptimizerExperiment
+   * @see sfGWOExperiment
    */
   public function insertContent($response)
   {

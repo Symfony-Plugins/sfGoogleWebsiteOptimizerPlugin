@@ -1,16 +1,16 @@
 # all:
-#   sf_google_website_optimizer_plugin:
+#   sf_gwo_plugin:
 #     enabled:      off
 #     uacct:        XX-XXXXX-X
 #     classes:
-#       ab:         sfGoogleWebsiteOptimizerABExperiment
-#       multi:      sfGoogleWebsiteOptimizerMultiExperiment
+#       ab:         sfGWOExperimentAB
+#       multi:      sfGWOExperimentMulti
 #     experiments:
 #       # the following represents an example A/B experiment, not default values
 #       home_page1:
 #         enabled:  on
-#         uacct:    XX-XXXXX-X
 #         type:     ab
+#         uacct:    XX-XXXXX-X
 #         key:      0000000000
 #         pages:
 #           original: { module: main, action: index }

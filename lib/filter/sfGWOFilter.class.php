@@ -8,7 +8,7 @@
  * @author      Kris Wallsmith <kris [dot] wallsmith [at] gmail [dot] com>
  * @version     SVN: $Id$
  */
-class sfGoogleWebsiteOptimizerFilter extends sfFilter
+class sfGWOFilter extends sfFilter
 {
   public function execute($filterChain)
   {
@@ -18,7 +18,7 @@ class sfGoogleWebsiteOptimizerFilter extends sfFilter
     $filterChain->execute();
     
     // connect to each active experiment
-    $prefix = 'app_sf_google_website_optimizer_plugin_';
+    $prefix = 'app_sf_gwo_plugin_';
     if (sfConfig::get($prefix.'enabled', false))
     {
       foreach (sfConfig::get($prefix.'experiments', array()) as $name => $param)
@@ -35,8 +35,8 @@ class sfGoogleWebsiteOptimizerFilter extends sfFilter
           // determine experiment class
           $classes = sfConfig::get($prefix.'classes', array());
           $classes = array_merge(array(
-            'ab'    => 'sfGoogleWebsiteOptimizerABExperiment', 
-            'multi' => 'sfGoogleWebsiteOptimizerMultiExperiment'), $classes);
+            'ab'    => 'sfGWOExperimentAB', 
+            'multi' => 'sfGWOExperimentMulti'), $classes);
           
           if (isset($classes[$param['type']]))
           {
