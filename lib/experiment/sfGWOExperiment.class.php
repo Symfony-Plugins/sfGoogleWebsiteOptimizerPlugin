@@ -121,9 +121,21 @@ abstract class sfGWOExperiment
   /**
    * Insert the appropriate content for the connected page.
    * 
+   * @throws  sfConfigurationException
+   * 
    * @param   sfResponse $response
    */
-  abstract function insertContent($response);
+  public function insertContent($response)
+  {
+    $page = $this->parameterHolder->get('page', null, 'connected');
+    $method = 'insert'.ucwords($page).'PageContent';
+    if (!method_exists($this, $method))
+    {
+      throw new sfConfigurationException(sprintf('No insertion method found for page type "%s".', $page));
+    }
+    
+    $this->$method($response);
+  }
   
   /**
    * Shared utility method for inserting content into the response.
@@ -167,6 +179,70 @@ abstract class sfGWOExperiment
       
       $response->setContent($new);
     }
+  }
+  
+  /**
+   * Get the GWO control script.
+   * 
+   * @param   string $key
+   * 
+   * @return  string
+   */
+  protected function getControlScript($key)
+  {
+    $script = 
+<<<HTML
+<script>
+function utmx_section(){}function utmx(){}
+(function(){var k='%s',d=document,l=d.location,c=d.cookie;function f(n){
+if(c){var i=c.indexOf(n+'=');if(i>-1){var j=c.indexOf(';',i);return c.substring(i+n.
+length+1,j<0?c.length:j)}}}var x=f('__utmx'),xx=f('__utmxx'),h=l.hash;
+d.write('<sc'+'ript src="'+
+'http'+(l.protocol=='https:'?'s://ssl':'://www')+'.google-analytics.com'
++'/siteopt.js?v=1&utmxkey='+k+'&utmx='+(x?x:'')+'&utmxx='+(xx?xx:'')+'&utmxtime='
++new Date().valueOf()+(h?'&utmxhash='+escape(h.substr(1)):'')+
+'" type="text/javascript" charset="utf-8"></sc'+'ript>')})();
+</script>
+HTML;
+    
+    return sprintf($script, $key);
+  }
+  
+  /**
+   * Get the GWO tracker script.
+   * 
+   * @param   string $uacct
+   * @param   string $key
+   * @param   string $page
+   * @param   array $vars
+   * 
+   * @return  string
+   */
+  protected function getTrackerScript($uacct, $key, $page)
+  {
+    // TODO:
+    // test for presence of google analytics js variables that need
+    // to be repeated here: _udn, _uhash, _utimeout, _utcp
+    $vars = null;
+    if (class_exists('sfGoogleAnalyticsFilter') && sfConfig::get('app_google_analytics_enabled'))
+    {
+      
+    }
+    
+    $script = 
+<<<HTML
+<script>
+if(typeof(urchinTracker)!='function')document.write('<sc'+'ript src="'+
+'http'+(document.location.protocol=='https:'?'s://ssl':'://www')+
+'.google-analytics.com/urchin.js'+'"></sc'+'ript>')
+</script>
+<script>
+_uacct = '%s';%s
+urchinTracker("/%s/%s");
+</script>
+HTML;
+    
+    return sprintf($script, $uacct, $vars, $key, $page);
   }
   
 }

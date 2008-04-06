@@ -5,16 +5,29 @@
 #     classes:
 #       ab:         sfGWOExperimentAB
 #       multi:      sfGWOExperimentMulti
+# 
+#     # the following experiments are examples, not default values.
 #     experiments:
-#       # the following represents an example A/B experiment, not default values
-#       home_page1:
+#       
+#       # an example of an A/B experiment
+#       example1:
 #         enabled:  on
 #         type:     ab
 #         uacct:    XX-XXXXX-X
-#         key:      0000000000
+#         key:      XXXXXXXXXX
 #         pages:
 #           original: { module: main, action: index }
 #           variations:
 #             - { module: main, action: index2 }
 #             - { module: main, action: index3 }
+#           conversion: { module: sfGuardAuth, action: register }
+#       
+#       # an example of a multivariate experiment
+#       example2:
+#         enabled:  on
+#         type:     multi
+#         uacct:    XX-XXXXX-X
+#         key:      XXXXXXXXXX
+#         pages:
+#           test: { module: main, action: index }
 #           conversion: { module: sfGuardAuth, action: register }

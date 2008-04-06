@@ -10,6 +10,13 @@
  */
 class sfGWOFilter extends sfFilter
 {
+  /**
+   * Insert appropriate experiment code.
+   * 
+   * @throws  sfConfigurationException
+   * 
+   * @param   sfFilterChain $filterChain
+   */
   public function execute($filterChain)
   {
     $request  = $this->context->getRequest();
