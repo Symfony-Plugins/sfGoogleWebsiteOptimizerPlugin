@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Insert experiments into responses when request parameters are matched.
+ * 
+ * @package     sfGoogleWebsiteOptimizerPlugin
+ * @subpackage  filter
+ * @author      Kris Wallsmith <kris [dot] wallsmith [at] gmail [dot] com>
+ * @version     SVN: $Id$
+ */
 class sfGoogleWebsiteOptimizerFilter extends sfFilter
 {
   public function execute($filterChain)
@@ -15,27 +23,33 @@ class sfGoogleWebsiteOptimizerFilter extends sfFilter
     {
       foreach (sfConfig::get($prefix.'experiments', array()) as $name => $param)
       {
-        $param = array_merge(array('enabled' => false, 'type' => null, 'key' => null, 'uacct' => null), $param);
+        // merge default with configured parameters
+        $param = array_merge(array(
+          'enabled' => false, 
+          'type'    => null, 
+          'key'     => null, 
+          'uacct'   => sfConfig::get($prefix.'uacct'), 
+          'pages'   => array()), $param);
         if ($param['enabled'])
         {
-          switch ($param['type'])
+          // determine experiment class
+          $classes = sfConfig::get($prefix.'classes', array());
+          $classes = array_merge(array(
+            'ab'    => 'sfGoogleWebsiteOptimizerABExperiment', 
+            'multi' => 'sfGoogleWebsiteOptimizerMultiExperiment'), $classes);
+          
+          if (isset($classes[$param['type']]))
           {
-            case 'ab':
-            $class = sfConfig::get($prefix.'ab_experiment_class', 'sfGoogleWebsiteOptimizerABExperiment');
-            break;
-            case 'multi':
-            $class = sfConfig::get($prefix.'multi_experiment_class', 'sfGoogleWebsiteOptimizerMultiExperiment');
-            break;
-            default:
-            throw new sfConfigurationException(sprintf('The experiment "%s" must have a type of either "ab" or "multi", not "%s"', $name, $param['type']));
+            $class = $classes[$param['type']];
+            $experiment = new $class($name, $param);
+            if ($experiment->connect($request))
+            {
+              $experiment->insertContent($response);
+            }
           }
-          
-          unset($param['enabled'], $param['type']);
-          
-          $experiment = new $class($name, $param);
-          if ($experiment->connect($request))
+          else
           {
-            $experiment->insertContent($response);
+            throw new sfConfigurationException(sprintf('The experiment type "%s" was not found.', $param['type']));
           }
         }
       }

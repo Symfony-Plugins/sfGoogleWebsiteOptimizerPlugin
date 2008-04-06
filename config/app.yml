@@ -1,10 +1,20 @@
 # all:
 #   sf_google_website_optimizer_plugin:
-#     enabled: off
-#     ab_experiment_class: sfGoogleWebsiteOptimizerABExperiment
-#     multi_experiment_class: sfGoogleWebsiteOptimizerMultiExperiment
+#     enabled:      off
+#     uacct:        XX-XXXXX-X
+#     classes:
+#       ab:         sfGoogleWebsiteOptimizerABExperiment
+#       multi:      sfGoogleWebsiteOptimizerMultiExperiment
 #     experiments:
-#       landing_page1:
+#       # the following represents an example A/B experiment, not default values
+#       home_page1:
 #         enabled:  on
+#         uacct:    XX-XXXXX-X
 #         type:     ab
 #         key:      0000000000
+#         pages:
+#           original: { module: main, action: index }
+#           variations:
+#             - { module: main, action: index2 }
+#             - { module: main, action: index3 }
+#           conversion: { module: sfGuardAuth, action: register }

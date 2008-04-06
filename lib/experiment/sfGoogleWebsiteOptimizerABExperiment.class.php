@@ -1,7 +1,18 @@
 <?php
 
+/**
+ * Logic specific to A/B experiments.
+ * 
+ * @package     sfGoogleWebsiteOptimizerPlugin
+ * @subpackage  experiment
+ * @author      Kris Wallsmith <kris [dot] wallsmith [at] gmail [dot] com>
+ * @version     SVN: $Id$
+ */
 class sfGoogleWebsiteOptimizerABExperiment extends sfGoogleWebsiteOptimizerExperiment
 {
+  /**
+   * @see sfGoogleWebsiteOptimizerExperiment
+   */
   public function insertContent($response)
   {
     $page = $this->parameterHolder->get('page', null, 'connected');
@@ -14,6 +25,11 @@ class sfGoogleWebsiteOptimizerABExperiment extends sfGoogleWebsiteOptimizerExper
     $this->$method($response);
   }
   
+  /**
+   * Insert content for the original page.
+   * 
+   * @param   sfResponse $response
+   */
   protected function insertOriginalPageContent($response)
   {
     $topContent = 
@@ -53,6 +69,11 @@ HTML;
     $this->doInsert($response, $bottomContent, self::POSITION_BOTTOM);
   }
   
+  /**
+   * Insert content for a variation page.
+   * 
+   * @param   sfResponse $response
+   */
   protected function getVariationPageContent($response)
   {
     $content = 
@@ -73,6 +94,11 @@ HTML;
     $this->doInsert($response, $content, self::POSITION_BOTTOM);
   }
   
+  /**
+   * Insert content for the conversion page.
+   * 
+   * @param   sfResponse $response
+   */
   protected function getConversionPageContent($response, $key)
   {
     $content = 

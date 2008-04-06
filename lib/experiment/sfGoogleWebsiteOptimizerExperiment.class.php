@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Common logic for all experiment classes.
+ * 
+ * @package     sfGoogleWebsiteOptimizerPlugin
+ * @subpackage  experiment
+ * @author      Kris Wallsmith <kris [dot] wallsmith [at] gmail [dot] com>
+ * @version     SVN: $Id$
+ */
 abstract class sfGoogleWebsiteOptimizerExperiment
 {
   const
@@ -23,23 +31,29 @@ abstract class sfGoogleWebsiteOptimizerExperiment
     $this->key    = $param['key'];
     $this->uacct  = $param['uacct'];
     
-    unset($param['key'], $param['uacct']);
-    
     $this->parameterHolder = new sfParameterHolder;
-    $this->parameterHolder->add($param);
+    $this->parameterHolder->add($param['pages'], 'pages');
   }
   
+  /**
+   * Attempt to connect this experiment to the supplied request.
+   * 
+   * @param   sfRequest $request
+   * 
+   * @return  bool
+   */
   public function connect($request)
   {
     $params = array(
-      'original'    => $this->parameterHolder->get('original', array()),
-      'variation'   => $this->parameterHolder->get('variations', array(array())),
-      'conversion'  => $this->parameterHolder->get('conversion', array()),
+      'original'   => $this->parameterHolder->get('original', array(), 'pages'),
+      'variation'  => $this->parameterHolder->get('variations', array(array()), 'pages'),
+      'conversion' => $this->parameterHolder->get('conversion', array(), 'pages'),
     );
     
     $connected = null;
     foreach ($params as $page => $param)
     {
+      // loop through indexed arrays, interogate associative arrays
       if (is_int($page))
       {
         foreach ($param as $p)
@@ -60,10 +74,12 @@ abstract class sfGoogleWebsiteOptimizerExperiment
     
     if (is_null($connected))
     {
+      // no connection
       return false;
     }
     else
     {
+      // capture connected page parameters
       $this->parameterHolder->set('page', $page, 'connected');
       $this->parameterHolder->addByRef($connected, 'connected');
       
@@ -71,15 +87,25 @@ abstract class sfGoogleWebsiteOptimizerExperiment
     }
   }
   
+  /**
+   * Connection test logic.
+   * 
+   * Overload this method to customize how a connection is determined.
+   * 
+   * @param   sfRequest $request
+   * @param   string $page
+   * @param   array $param
+   * 
+   * @return  bool
+   */
   protected function doConnect($request, $page, $param)
   {
-    $match = true;
-    
     if (sfConfig::get('sf_logging_enabled'))
     {
       sfContext::getInstance()->getLogger()->info(sprintf('{%s} connect %s:%s', __CLASS__, $this->name, $page));
     }
     
+    $match = true;
     foreach ($param as $key => $value)
     {
       if ($request->getParameter($key) != $value)
@@ -92,29 +118,55 @@ abstract class sfGoogleWebsiteOptimizerExperiment
     return $match;
   }
   
+  /**
+   * Insert the appropriate content for the connected page.
+   * 
+   * @param   sfResponse $response
+   */
   abstract function insertContent($response);
   
-  protected function doInsert($response, $content, $position = 'top')
+  /**
+   * Shared utility method for inserting content into the response.
+   * 
+   * @param   sfResponse $response
+   * @param   string $content Content for insertion
+   * @param   string $position
+   */
+  protected function doInsert($response, $content, $position = null)
   {
-    $old = $response->getContent();
-    
-    switch ($position)
+    if (is_null($position))
     {
-      case 'top':
-      $new = preg_replace('/<body[^>]*>/i', "$0\n".$content, $old, 1);
-      break;
+      $position = self::POSITION_TOP;
+    }
+    
+    // check for overload
+    $method = 'doInsert'.$position;
+    if (method_exists($this, $method))
+    {
+      call_user_func(array($this, $method), $response, $content);
+    }
+    else
+    {
+      $old = $response->getContent();
       
-      case 'bottom':
-      $new = str_ireplace('</body>', $content."\n</body>", $old);
-      break;
+      switch ($position)
+      {
+        case self::POSITION_TOP:
+        $new = preg_replace('/<body[^>]*>/i', "$0\n".$content, $old, 1);
+        break;
+        
+        case self::POSITION_BOTTOM:
+        $new = str_ireplace('</body>', $content."\n</body>", $old);
+        break;
+      }
+      
+      if ($old == $new)
+      {
+        $new .= $content;
+      }
+      
+      $response->setContent($new);
     }
-    
-    if ($old == $new)
-    {
-      $new .= $content;
-    }
-    
-    $response->setContent($new);
   }
   
 }
