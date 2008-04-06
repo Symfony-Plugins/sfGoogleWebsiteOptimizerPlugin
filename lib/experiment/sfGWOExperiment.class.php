@@ -92,6 +92,9 @@ abstract class sfGWOExperiment
    * 
    * Overload this method to customize how a connection is determined.
    * 
+   * @todo    Add support for configuring a request parameter that should
+   *          _not_ be present.
+   * 
    * @param   sfRequest $request
    * @param   string $page
    * @param   array $param
@@ -211,6 +214,9 @@ HTML;
   /**
    * Get the GWO tracker script.
    * 
+   * If sfGoogleAnalyticsPlugin is installed and enabled, those Javascript
+   * vars that need to be repeated here will automatically be inserted.
+   * 
    * @param   string $uacct
    * @param   string $key
    * @param   string $page
@@ -220,13 +226,32 @@ HTML;
    */
   protected function getTrackerScript($uacct, $key, $page)
   {
-    // TODO:
-    // test for presence of google analytics js variables that need
-    // to be repeated here: _udn, _uhash, _utimeout, _utcp
     $vars = null;
     if (class_exists('sfGoogleAnalyticsFilter') && sfConfig::get('app_google_analytics_enabled'))
     {
-      
+      // include select Google Analytics variables
+      foreach (sfConfig::get('app_google_analytics_vars', array()) as $var => $value)
+      {
+        if ($var{0} != '_')
+        {
+          $var = '_'.$var;
+        }
+        
+        if (in_array($var, array('_udn', '_uhash', '_utimeout', '_utcp')))
+        {
+          if (function_exists('json_encode'))
+          {
+            $value = json_encode($value);
+          }
+          else
+          {
+            sfLoader::loadHelpers(array('Escaping'));
+            $value = '"'.esc_js($value).'"';
+          }
+          
+          $vars .= sprintf("\n%s=%s;", $var, $value);
+        }
+      }
     }
     
     $script = 
