@@ -1,0 +1,108 @@
+= sfGoogleWebsiteOptimizerPlugin =
+
+Easily add Google Website Optimizer experiments to your symfony project.
+
+== Installation ==
+
+This plugin requires you add its filter to your project's `filters.yml` configuration file:
+
+{{{
+#!yaml
+rendering: ~
+web_debug: ~
+security:  ~
+
+# generally, you will want to insert your own filters here
+sf_google_website_optimizer_plugin:
+  class: sfGWOFilter
+
+cache:     ~
+common:    ~
+flash:     ~
+execution: ~
+}}}
+
+== A/B Experiments ==
+
+The configuration for an A/B experiment should look something like this (in `app.yml`):
+
+{{{
+#!yaml
+all:
+  sf_google_website_optimizer_plugin:
+    enabled:      on
+    uacct:        XX-XXXXX-X
+    experiments:
+      register1:
+        enabled:  on
+        type:     ab
+        key:      XXXXXXXXXX
+        pages:
+          original: { module: sfGuardAuth, action: register }
+          variations:
+            - { module: sfGuardAuth, action: registerAlt1 }
+            - { module: sfGuardAuth, action: registerAlt2 }
+          conversion: { module: main, action: welcome }
+}}}
+
+Once configured, the plugin's filter will automatically insert the necessary code to run this experiment on those pages that match the original, variation and conversion pages.
+
+== Multivariate Experiments ==
+
+The configuration for a multivariate experiment should look something like this (in `app.yml`):
+
+{{{
+#!yaml
+all:
+  sf_google_website_optimizer_plugin:
+    enabled:      on
+    uacct:        XX-XXXXX-X
+    experiments:
+      home1:
+        enabled:  on
+        type:     multivariate
+        key:      XXXXXXXXXX
+        pages:
+          test: { module: main, action: index }
+          conversion: { module: sfGuardAuth, action: register }
+}}}
+
+The view for `main/index` should include calls to the plugin's helper functions to declare the experiment sections:
+
+{{{
+#!php
+<?php use_helper('GWO') ?>
+
+<h1>
+<?php echo gwo_section('greeting') ?>
+Welcome to our site!
+<?php echo gwo_section_end() ?>
+</h1>
+}}}
+
+== How to determine your experiment `key` and `uacct` values ==
+
+These values can be easily extracted from the code Google provides for insertion at the bottom of your experiment's conversion page. Toward the bottom of this code, you'll see something like this:
+
+{{{
+#!js
+_uacct = 'XX-XXXXX-X';
+urchinTracker("/XXXXXXXXXX/goal");
+}}}
+
+Your experiment's `uacct` value is the string of letters and numbers assigned to the Javascript `_uacct` variable. Your experiment's key is the string of numbers between the two slashes in the string passed to the Javascript `urchinTracker` function.
+
+== Roadmap ==
+
+ * Easy extraction of experiment key value from Google code (by copy/paste to an admin module?)
+ * symfony 1.1 compatability
+
+== Changelog ==
+
+=== 2008-04-07 0.1.0-beta ===
+
+ * Initial release
+
+== Author ==
+
+ * Kris Wallsmith
