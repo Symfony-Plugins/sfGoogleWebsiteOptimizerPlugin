@@ -11,9 +11,9 @@
 #       
 #       # an example of an A/B experiment
 #       example1:
-#         enabled:  on
+#         enabled:  on              # <-- defaults to on, if not present
 #         type:     ab
-#         uacct:    XX-XXXXX-X
+#         uacct:    XX-XXXXX-X      # <-- inherits from above, if not present
 #         key:      XXXXXXXXXX
 #         pages:
 #           original: { module: main, action: index }

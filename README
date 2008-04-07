@@ -34,7 +34,6 @@ all:
     uacct:        XX-XXXXX-X
     experiments:
       register1:
-        enabled:  on
         type:     ab
         key:      XXXXXXXXXX
         pages:
@@ -59,7 +58,6 @@ all:
     uacct:        XX-XXXXX-X
     experiments:
       home1:
-        enabled:  on
         type:     multivariate
         key:      XXXXXXXXXX
         pages:

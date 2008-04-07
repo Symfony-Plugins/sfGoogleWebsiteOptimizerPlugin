@@ -32,7 +32,7 @@ class sfGWOFilter extends sfFilter
       {
         // merge default with configured parameters
         $param = array_merge(array(
-          'enabled' => false, 
+          'enabled' => true, 
           'type'    => null, 
           'key'     => null, 
           'uacct'   => sfConfig::get($prefix.'uacct'), 
