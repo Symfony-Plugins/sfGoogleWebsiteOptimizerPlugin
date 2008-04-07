@@ -16,11 +16,11 @@
 #         uacct:    XX-XXXXX-X      # <-- inherits from above, if not present
 #         key:      XXXXXXXXXX
 #         pages:
-#           original: { module: main, action: index }
+#           original: { module: main, action: index, alt: ~ }
 #           variations:
-#             - { module: main, action: index2 }
-#             - { module: main, action: index3 }
-#           conversion: { module: sfGuardAuth, action: register }
+#             - { module: main, action: index, alt: 1 }
+#             - { module: main, action: index, alt: 2 }
+#           conversion: { module: auth, action: register }
 #       
 #       # an example of a multivariate experiment
 #       example2:
@@ -30,4 +30,4 @@
 #         key:      XXXXXXXXXX
 #         pages:
 #           test: { module: main, action: index }
-#           conversion: { module: sfGuardAuth, action: register }
+#           conversion: { module: auth, action: register }

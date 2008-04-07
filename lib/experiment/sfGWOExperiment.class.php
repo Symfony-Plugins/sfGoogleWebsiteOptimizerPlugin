@@ -125,7 +125,10 @@ abstract class sfGWOExperiment
     $match = true;
     foreach ($param as $key => $value)
     {
-      if ($request->getParameter($key) != $value)
+      // if value is null (~ in yml), this parameter must be absent, 
+      // otherwise the value must match the request parameter
+      if ((is_null($value) && $request->hasParameter($key)) ||
+          $request->getParameter($key) !== $value)
       {
         $match = false;
         break;
