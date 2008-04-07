@@ -35,6 +35,26 @@ abstract class sfGWOExperiment
     $this->parameterHolder->add($param['pages'], 'pages');
   }
   
+  public function getName()
+  {
+    return $this->name;
+  }
+  
+  public function getKey()
+  {
+    return $this->key;
+  }
+  
+  public function getUacct()
+  {
+    return $this->uacct;
+  }
+  
+  public function getParameterHolder()
+  {
+    return $this->parameterHolder;
+  }
+  
   /**
    * Attempt to connect this experiment to the supplied request.
    * 
@@ -42,13 +62,13 @@ abstract class sfGWOExperiment
    * 
    * @return  bool
    */
-  public function connect($request)
+  public function connect(sfRequest $request)
   {
     $connected = null;
     foreach ($this->parameterHolder->getAll('pages') as $page => $param)
     {
       // loop through indexed arrays, interogate associative arrays
-      if (is_int($page))
+      if (is_int(key($param)))
       {
         foreach ($param as $p)
         {
@@ -95,7 +115,7 @@ abstract class sfGWOExperiment
    * 
    * @return  bool
    */
-  protected function doConnect($request, $page, $param)
+  protected function doConnect(sfRequest $request, $page, $param)
   {
     if (sfConfig::get('sf_logging_enabled'))
     {
@@ -122,7 +142,7 @@ abstract class sfGWOExperiment
    * 
    * @param   sfResponse $response
    */
-  public function insertContent($response)
+  public function insertContent(sfResponse $response)
   {
     $page = $this->parameterHolder->get('page', null, 'connected');
     $method = 'insert'.ucwords($page).'PageContent';
@@ -141,7 +161,7 @@ abstract class sfGWOExperiment
    * @param   string $content Content for insertion
    * @param   string $position
    */
-  protected function doInsert($response, $content, $position = null)
+  protected function doInsert(sfResponse $response, $content, $position = null)
   {
     if (is_null($position))
     {
@@ -161,11 +181,11 @@ abstract class sfGWOExperiment
       switch ($position)
       {
         case self::POSITION_TOP:
-        $new = preg_replace('/<body[^>]*>/i', "$0\n".$content, $old, 1);
+        $new = preg_replace('/<body[^>]*>/i', "$0\n".$content."\n", $old, 1);
         break;
         
         case self::POSITION_BOTTOM:
-        $new = str_ireplace('</body>', $content."\n</body>", $old);
+        $new = str_ireplace('</body>', "\n".$content."\n</body>", $old);
         break;
       }
       
@@ -189,6 +209,7 @@ abstract class sfGWOExperiment
   {
     $script = 
 <<<HTML
+<!-- control script -->
 <script>
 function utmx_section(){}function utmx(){}
 (function(){var k='%s',d=document,l=d.location,c=d.cookie;function f(n){
@@ -200,6 +221,7 @@ d.write('<sc'+'ript src="'+
 +new Date().valueOf()+(h?'&utmxhash='+escape(h.substr(1)):'')+
 '" type="text/javascript" charset="utf-8"></sc'+'ript>')})();
 </script>
+<!-- control script end -->
 HTML;
     
     return sprintf($script, $key);
@@ -211,14 +233,13 @@ HTML;
    * If sfGoogleAnalyticsPlugin is installed and enabled, those Javascript
    * vars that need to be repeated here will automatically be inserted.
    * 
-   * @param   string $uacct
    * @param   string $key
+   * @param   string $uacct
    * @param   string $page
-   * @param   array $vars
    * 
    * @return  string
    */
-  protected function getTrackerScript($uacct, $key, $page)
+  protected function getTrackerScript($key, $uacct, $page)
   {
     $vars = null;
     if (class_exists('sfGoogleAnalyticsFilter') && sfConfig::get('app_google_analytics_enabled'))
@@ -250,6 +271,7 @@ HTML;
     
     $script = 
 <<<HTML
+<!-- tracker script -->
 <script>
 if(typeof(urchinTracker)!='function')document.write('<sc'+'ript src="'+
 'http'+(document.location.protocol=='https:'?'s://ssl':'://www')+
@@ -259,6 +281,7 @@ if(typeof(urchinTracker)!='function')document.write('<sc'+'ript src="'+
 _uacct = '%s';%s
 urchinTracker("/%s/%s");
 </script>
+<!-- tracker script end -->
 HTML;
     
     return sprintf($script, $uacct, $vars, $key, $page);

@@ -17,8 +17,15 @@ class sfGWOExperimentAB extends sfGWOExperiment
    */
   protected function insertOriginalPageContent($response)
   {
-    $control  = $this->getControlScript($this->key);
-    $control .= '<script>utmx("url", \'A/B\')</script>';
+    $control = $this->getControlScript($this->key);
+    
+    // insert a/b function
+    $lines = explode("\n", $control);
+    $end = array_pop($lines);
+    $lines[] = '<script>utmx("url", \'A/B\')</script>';
+    $lines[] = $end;
+    $control = join("\n", $lines);
+    
     $this->doInsert($response, $control, self::POSITION_TOP);
     
     $tracker = $this->getTrackerScript($this->uacct, $this->key, 'test');
