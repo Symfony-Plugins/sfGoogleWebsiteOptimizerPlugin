@@ -44,14 +44,8 @@ abstract class sfGWOExperiment
    */
   public function connect($request)
   {
-    $params = array(
-      'original'   => $this->parameterHolder->get('original', array(), 'pages'),
-      'variation'  => $this->parameterHolder->get('variations', array(array()), 'pages'),
-      'conversion' => $this->parameterHolder->get('conversion', array(), 'pages'),
-    );
-    
     $connected = null;
-    foreach ($params as $page => $param)
+    foreach ($this->parameterHolder->getAll('pages') as $page => $param)
     {
       // loop through indexed arrays, interogate associative arrays
       if (is_int($page))

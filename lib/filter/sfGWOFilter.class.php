@@ -19,15 +19,15 @@ class sfGWOFilter extends sfFilter
    */
   public function execute($filterChain)
   {
-    $request  = $this->context->getRequest();
-    $response = $this->context->getResponse();
-    
     $filterChain->execute();
     
     // connect to each active experiment
-    $prefix = 'app_sf_gwo_plugin_';
+    $prefix = 'app_sf_google_website_optimizer_plugin_';
     if (sfConfig::get($prefix.'enabled', false))
     {
+      $request  = $this->context->getRequest();
+      $response = $this->context->getResponse();
+      
       foreach (sfConfig::get($prefix.'experiments', array()) as $name => $param)
       {
         // merge default with configured parameters
@@ -42,8 +42,8 @@ class sfGWOFilter extends sfFilter
           // determine experiment class
           $classes = sfConfig::get($prefix.'classes', array());
           $classes = array_merge(array(
-            'ab'    => 'sfGWOExperimentAB', 
-            'multi' => 'sfGWOExperimentMulti'), $classes);
+            'ab'           => 'sfGWOExperimentAB', 
+            'multivariate' => 'sfGWOExperimentMultivariate'), $classes);
           
           if (isset($classes[$param['type']]))
           {

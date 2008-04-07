@@ -1,11 +1,11 @@
 # all:
-#   sf_gwo_plugin:
+#   sf_google_website_optimizer_plugin:
 #     enabled:      off
 #     uacct:        XX-XXXXX-X
 #     classes:
-#       ab:         sfGWOExperimentAB
-#       multi:      sfGWOExperimentMulti
-# 
+#       ab:             sfGWOExperimentAB
+#       multivariate:   sfGWOExperimentMultivariate
+#     
 #     # the following experiments are examples, not default values.
 #     experiments:
 #       
@@ -25,7 +25,7 @@
 #       # an example of a multivariate experiment
 #       example2:
 #         enabled:  on
-#         type:     multi
+#         type:     multivariate
 #         uacct:    XX-XXXXX-X
 #         key:      XXXXXXXXXX
 #         pages:

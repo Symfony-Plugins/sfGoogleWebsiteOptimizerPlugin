@@ -8,7 +8,7 @@
  * @author      Kris Wallsmith <kris [dot] wallsmith [at] gmail [dot] com>
  * @version     SVN: $Id$
  */
-class sfGWOExperimentMulti extends sfGWOExperiment
+class sfGWOExperimentMultivariate extends sfGWOExperiment
 {
   /**
    * Insert content for the test page.
