@@ -13,7 +13,7 @@ class sfGWOFilter extends sfFilter
   /**
    * Insert appropriate experiment code.
    * 
-   * @throws  sfConfigurationException
+   * @throws  sfConfigurationException If the configured experiment type cannot be found
    * 
    * @param   sfFilterChain $filterChain
    */
@@ -62,5 +62,4 @@ class sfGWOFilter extends sfFilter
       }
     }
   }
-  
 }

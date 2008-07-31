@@ -1,77 +1,63 @@
-= sfGoogleWebsiteOptimizerPlugin =
-
-Easily add Google Website Optimizer experiments to your symfony project.
-
-== Installation ==
+Installation
+------------
 
 This plugin requires you add its filter to your project's `filters.yml` configuration file:
 
-{{{
-#!yaml
-rendering: ~
-web_debug: ~
-security:  ~
+    rendering: ~
+    web_debug: ~
+    security:  ~
 
-# generally, you will want to insert your own filters here
-sf_google_website_optimizer_plugin:
-  class: sfGWOFilter
+    # generally, you will want to insert your own filters here
+    sf_google_website_optimizer_plugin:
+      class: sfGWOFilter
 
-cache:     ~
-common:    ~
-flash:     ~
-execution: ~
-}}}
+    cache:     ~
+    common:    ~
+    flash:     ~
+    execution: ~
 
-== A/B Experiments ==
+A/B Experiments
+---------------
 
 The configuration for an A/B experiment should look something like this (in `app.yml`):
 
-{{{
-#!yaml
-all:
-  sf_google_website_optimizer_plugin:
-    enabled:      on
-    uacct:        XX-XXXXX-X
-    experiments:
-      register1:
-        type:     ab
-        key:      XXXXXXXXXX
-        pages:
-          original: { module: auth, action: register, alt: ~ }
-          variations:
-            - { module: auth, action: register, alt: 1 }
-            - { module: auth, action: register, alt: 2 }
-          conversion: { module: main, action: welcome }
-}}}
+    all:
+      sf_google_website_optimizer_plugin:
+        enabled:      on
+        uacct:        XX-XXXXX-X
+        experiments:
+          register1:
+            type:     ab
+            key:      XXXXXXXXXX
+            pages:
+              original: { module: auth, action: register, alt: ~ }
+              variations:
+                - { module: auth, action: register, alt: 1 }
+                - { module: auth, action: register, alt: 2 }
+              conversion: { module: main, action: welcome }
 
 Once configured, the plugin's filter will automatically insert the necessary code to run this experiment on those requests whose parameters match those of the original, variation and conversion pages.
 
 The example above uses one action with multiple template files. This `auth/register` action may look something like this:
 
-{{{
-#!php
-<?php
-
-class authActions extends sfActions
-{
-  public function executeRegister()
-  {
-    parent::executeRegister();
-    
-    switch ($this->getRequestParameter('alt'))
+    [php]
+    class authActions extends sfActions
     {
-      case '1':
-      return 'Alt1';
+      public function executeRegister()
+      {
+        switch ($this->getRequestParameter('alt'))
+        {
+          case '1':
+          return 'Alt1';
       
-      case '2':
-      return 'Alt2';
+          case '2':
+          return 'Alt2';
       
-      default:
-      return sfView::SUCCESS;
+          default:
+          return sfView::SUCCESS;
+        }
+      }
     }
-  }
-}
-}}}
 
 The experiment would then serve up one of the following template files:
 
@@ -79,65 +65,63 @@ The experiment would then serve up one of the following template files:
  * `registerAlt2.php` (variation 2)
  * `registerSuccess.php` (original)
 
-== Multivariate Experiments ==
+Multivariate Experiments
+------------------------
 
 The configuration for a multivariate experiment should look something like this (in `app.yml`):
 
-{{{
-#!yaml
-all:
-  sf_google_website_optimizer_plugin:
-    enabled:      on
-    uacct:        XX-XXXXX-X
-    experiments:
-      home1:
-        type:     multivariate
-        key:      XXXXXXXXXX
-        pages:
-          test: { module: main, action: index }
-          conversion: { module: auth, action: register }
-}}}
+    all:
+      sf_google_website_optimizer_plugin:
+        enabled:      on
+        uacct:        XX-XXXXX-X
+        experiments:
+          home1:
+            type:     multivariate
+            key:      XXXXXXXXXX
+            pages:
+              test: { module: main, action: index }
+              conversion: { module: auth, action: register }
 
 The view for `main/index` should include calls to the plugin's helper functions to declare the experiment sections:
 
-{{{
-#!php
-<?php use_helper('GWO') ?>
+    [php]
+    <?php use_helper('GWO') ?>
 
-<h1>
-<?php echo gwo_section('greeting') ?>
-Welcome to our site!
-<?php echo gwo_section_end() ?>
-</h1>
-}}}
+    <h1>
+    <?php echo gwo_section('greeting') ?>
+    Welcome to our site!
+    <?php echo gwo_section_end() ?>
+    </h1>
 
-== How to determine your experiment `key` and `uacct` values ==
+How to determine your experiment `key` and `uacct` values
+---------------------------------------------------------
 
 These values can be easily extracted from the code Google provides for insertion at the bottom of your experiment's conversion page. Toward the bottom of this code, you'll see something like this:
 
-{{{
-#!js
-_uacct = 'XX-XXXXX-X';
-urchinTracker("/XXXXXXXXXX/goal");
-}}}
+    _uacct = 'XX-XXXXX-X';
+    urchinTracker("/XXXXXXXXXX/goal");
 
 Your experiment's `uacct` value is the string of letters and numbers assigned to the Javascript `_uacct` variable. Your experiment's key is the string of numbers between the two slashes in the string passed to the Javascript `urchinTracker` function.
 
-== Roadmap ==
+Roadmap
+-------
 
  * Easy extraction of experiment key value from Google code (by copy/paste to an admin module?)
  * symfony 1.1 compatability
+ * Play nicely with `sfGoogleAnalyticsPlugin`
 
-== Changelog ==
+Changelog
+---------
 
-=== 2008-04-07 0.2.0-beta ===
+### 2008-07-31 1.0.0-stable
+
+ * Migrated `README` to Markdown for new plugins system
+ * Added `lime_harness` script to testing suite
+
+### 2008-04-07 0.2.0-beta
 
  * Updated `connect()` logic to watch for request parameters that should be absent.
 
-=== 2008-04-07 0.1.0-beta ===
+### 2008-04-07 0.1.0-beta
 
  * Initial release
-
-== Author ==
-
- * Kris Wallsmith
